@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Scheme Sarthi - Government Scheme Gap Analyzer & Action Planner{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="page-header" style="margin-top: 1.5rem;">
+    <span class="badge-tag">🏛️ National Citizen Assistance Portal</span>
+    <h1 class="page-title" style="font-size: 2.5rem; max-width: 900px; margin: 0 auto 0.75rem auto;">
+        Find Government Schemes You Are Eligible For — And Learn Exactly How To Apply
+    </h1>
+    <p class="page-subtitle" style="font-size: 1.15rem; max-width: 780px;">
+        Scheme Sarthi analyzes your profile, identifies missing criteria or document gaps, provides a step-by-step certificate roadmap, and connects you directly to official government application portals.
+    </p>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('analyzer') }}" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.9rem 2.2rem;">
+            🔍 Check Scheme Eligibility Now
+        </a>
+        <a href="{{ url_for('tracker') }}" class="btn btn-outline" style="font-size: 1.1rem; padding: 0.9rem 1.8rem;">
+            📍 Track Application Status
+        </a>
+    </div>
+</div>
+
+<!-- Key Service Pillars -->
+<div class="grid-2" style="margin-top: 2.5rem;">
+    <div class="card" style="border-top: 4px solid var(--primary);">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">
+            Intelligent Eligibility Analysis
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+            Evaluates your age, family income, education, category, location, and disability status against official central and state government scheme guidelines.
+        </p>
+    </div>
+
+    <div class="card" style="border-top: 4px solid #10b981;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">
+            Eligibility Gap Analyzer
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+            Instead of just giving a yes/no, Scheme Sarthi highlights exact missing income limits, certificate requirements, or category guidelines so you know how to become eligible.
+        </p>
+    </div>
+
+    <div class="card" style="border-top: 4px solid #f59e0b;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛠️</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">
+            Action Planner & Document Preparation
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+            Get a tailored roadmap to obtain missing Income, Caste, or Bonafide certificates along with an interactive pre-application document checklist.
+        </p>
+    </div>
+
+    <div class="card" style="border-top: 4px solid #3b82f6;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚀</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">
+            Official Portals & Status Tracker
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+            Direct one-click access to official government portals (NSP, PM-Kisan, JanSamarth) with built-in tracking for your submitted applications.
+        </p>
+    </div>
+</div>
+
+<!-- Covered Sectors Summary Banner -->
+<div class="card" style="margin-top: 2rem; text-align: center; background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 1px solid rgba(37,99,235,0.2); padding: 2.2rem 1.5rem;">
+    <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
+        🎓 Comprehensive Government Welfare Coverage
+    </h3>
+    <p style="font-size: 0.98rem; color: var(--text-muted); max-width: 820px; margin: 0 auto 1.25rem auto;">
+        Higher Education Scholarships, Subsidized Student Loans, Farmer Income Support, Housing Grants, Self-Employment Micro-Credit, PwD Empowerment, Skill Certification, and Social Security.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('analyzer') }}" class="btn btn-primary">
+            Start Eligibility Check ➔
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Create Citizen Account - Scheme Sarthi{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-top: 1rem;">
+    <span class="badge-tag">👤 User Registration</span>
+    <h1 class="page-title">Create Your Scheme Sarthi Account</h1>
+    <p class="page-subtitle">
+        Register to manage your personal application log, save scheme eligibility reports, and track your document progress.
+    </p>
+</div>
+
+<div style="max-width: 550px; margin: 0 auto;">
+    <form action="{{ url_for('register') }}" method="POST" class="card" style="box-shadow: var(--shadow-lg);">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+            ✍️ Account Details
+        </h3>
+
+        <div class="form-group">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required minlength="6">
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="state" class="form-label">Domicile State</label>
+                <select id="state" name="state" class="form-select">
+                    {% for st in states %}
+                        <option value="{{ st }}" {% if st == 'Karnataka' %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="category" class="form-label">Social Category</label>
+                <select id="category" name="category" class="form-select">
+                    <option value="General">General</option>
+                    <option value="OBC" selected>OBC</option>
+                    <option value="SC">SC</option>
+                    <option value="ST">ST</option>
+                    <option value="EWS">EWS</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary btn-block" style="font-size: 1rem; padding: 0.8rem;">
+                🚀 Create Account & Continue ➔
+            </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.25rem; font-size: 0.9rem; color: var(--text-muted);">
+            Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Log In here</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

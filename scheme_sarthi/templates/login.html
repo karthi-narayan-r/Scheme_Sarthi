@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}User Login - Scheme Sarthi{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-top: 1rem;">
+    <span class="badge-tag">🔑 Citizen Authentication</span>
+    <h1 class="page-title">Log In to Scheme Sarthi</h1>
+    <p class="page-subtitle">
+        Access your personal application log, saved scheme reports, and document readiness checklist.
+    </p>
+</div>
+
+<div style="max-width: 480px; margin: 0 auto;">
+    <form action="{{ url_for('login') }}" method="POST" class="card" style="box-shadow: var(--shadow-lg);">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+            🔒 Citizen Login
+        </h3>
+
+        <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary btn-block" style="font-size: 1rem; padding: 0.8rem;">
+                🔑 Log In ➔
+            </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.25rem; font-size: 0.9rem; color: var(--text-muted);">
+            Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Register Now</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

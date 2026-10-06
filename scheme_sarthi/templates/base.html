@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Scheme Sarthi - Government Scheme Gap Analyzer & Personal Log{% endblock %}</title>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Header & Navigation Bar -->
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="brand">
+            <div class="brand-icon">🏛️</div>
+            <div>
+                <span class="brand-title">Scheme Sarthi</span>
+                <span class="brand-subtitle">Government Scheme Portal & Personal Log</span>
+            </div>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
+            <li><a href="{{ url_for('analyzer') }}" class="{% if request.endpoint == 'analyzer' %}active{% endif %}">Find Schemes</a></li>
+            <li><a href="{{ url_for('results') }}" class="{% if request.endpoint == 'results' %}active{% endif %}">My Gap Analysis</a></li>
+            <li><a href="{{ url_for('tracker') }}" class="{% if request.endpoint == 'tracker' %}active{% endif %}">My Application Log</a></li>
+            
+            {% if current_user %}
+                <li style="display: flex; align-items: center; gap: 0.5rem; background: var(--primary-light); padding: 0.35rem 0.75rem; border-radius: 20px; border: 1px solid rgba(37,99,235,0.2);">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">👤 {{ current_user.name }}</span>
+                    <a href="{{ url_for('logout') }}" style="color: #ef4444; font-size: 0.8rem; font-weight: 700; text-decoration: none;">(Logout)</a>
+                </li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">Log In</a></li>
+                <li><a href="{{ url_for('register') }}" class="nav-btn">Register 🚀</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Main Content Body -->
+    <main class="container">
+        <!-- Flash Notification Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="max-width: 800px; margin: 0 auto 1.5rem auto;">
+                    {% for category, message in messages %}
+                        <div style="padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem;
+                            {% if category == 'danger' %}background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;
+                            {% elif category == 'success' %}background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;
+                            {% else %}background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><strong>Scheme Sarthi</strong> &bull; Citizen Scheme Gap Analyzer & Personal Log Manager</p>
+        <p style="margin-top:0.4rem; font-size:0.8rem;">Empowering citizens with intelligent scheme matching, document preparation roadmaps, and authentic personal application logs.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

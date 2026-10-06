@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Scheme Eligibility & Gap Analyzer Form - Scheme Sarthi{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-top: 1rem;">
+    <span class="badge-tag">📋 Citizen Profile Input</span>
+    <h1 class="page-title">Scheme Eligibility & Gap Analyzer</h1>
+    <p class="page-subtitle">
+        Enter your 12 profile factors below. Scheme Sarthi will evaluate your parameters across government scheme guidelines, identify eligibility gaps, and build your personalized action plan.
+    </p>
+</div>
+
+<div style="max-width: 850px; margin: 0 auto;">
+    <form action="{{ url_for('analyzer') }}" method="POST" class="card" style="box-shadow: var(--shadow-lg);">
+        
+        <!-- SECTION 1: Personal & Demographic Info -->
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+            1️⃣ Personal & Demographic Factors
+        </h3>
+
+        <!-- Row 1: Age & Gender -->
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="age" class="form-label">1. Age (Years)</label>
+                <input type="number" id="age" name="age" class="form-control" min="10" max="80" value="20" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gender" class="form-label">2. Gender</label>
+                <select id="gender" name="gender" class="form-select" required>
+                    <option value="Male" selected>Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Row 2: State & District -->
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="state" class="form-label">3. Domicile State / UT</label>
+                <select id="state" name="state" class="form-select" required>
+                    {% for st in states %}
+                        <option value="{{ st }}" {% if st == default_state %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="district" class="form-label">District / City</label>
+                <input type="text" id="district" name="district" class="form-control" value="Bangalore Urban" placeholder="e.g. Chennai, Bangalore, Mysuru">
+            </div>
+        </div>
+
+        <!-- Row 3: Area Type & Category -->
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="category" class="form-label">4. Social Category</label>
+                <select id="category" name="category" class="form-select" required>
+                    <option value="General" {% if default_category == 'General' %}selected{% endif %}>General</option>
+                    <option value="OBC" {% if default_category == 'OBC' %}selected{% endif %}>OBC (Other Backward Classes)</option>
+                    <option value="SC" {% if default_category == 'SC' %}selected{% endif %}>SC (Scheduled Caste)</option>
+                    <option value="ST" {% if default_category == 'ST' %}selected{% endif %}>ST (Scheduled Tribe)</option>
+                    <option value="EWS" {% if default_category == 'EWS' %}selected{% endif %}>EWS (Economically Weaker Section)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Residential Area Type</label>
+                <div class="toggle-group">
+                    <div class="toggle-option">
+                        <input type="radio" id="area_urban" name="area_type" value="Urban" checked>
+                        <label for="area_urban" class="toggle-label">🏙️ Urban</label>
+                    </div>
+                    <div class="toggle-option">
+                        <input type="radio" id="area_rural" name="area_type" value="Rural">
+                        <label for="area_rural" class="toggle-label">🌾 Rural</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: Income & Family Status -->
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 1.75rem 0 1.25rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+            2️⃣ Income & Family Conditions
+        </h3>
+
+        <!-- Income Slider -->
+        <div class="form-group" style="background: var(--primary-light); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid rgba(37,99,235,0.15);">
+            <label for="incomeRange" class="form-label">
+                5. Annual Family Income (₹)
+                <span id="incomeDisplay" class="range-val">₹1.80 Lakhs (₹1,80,000)</span>
+            </label>
+            <input type="range" id="incomeRange" name="income" class="form-range" min="30000" max="1500000" step="10000" value="180000">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                <span>₹30,000</span>
+                <span>₹2.5 Lakhs</span>
+                <span>₹4.5 Lakhs</span>
+                <span>₹8 Lakhs</span>
+                <span>₹15 Lakhs+</span>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="family_dependents" class="form-label">6. Family Size / Dependents Count</label>
+                <input type="number" id="family_dependents" name="family_dependents" class="form-control" min="1" max="12" value="4" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">7. Already Receiving Other Central Benefits?</label>
+                <div class="toggle-group">
+                    <div class="toggle-option">
+                        <input type="radio" id="ben_no" name="has_existing_benefits" value="no" checked>
+                        <label for="ben_no" class="toggle-label">No Prior Benefit</label>
+                    </div>
+                    <div class="toggle-option">
+                        <input type="radio" id="ben_yes" name="has_existing_benefits" value="yes">
+                        <label for="ben_yes" class="toggle-label">Yes (Active Benefit)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: Education & Employment Factors -->
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 1.75rem 0 1.25rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+            3️⃣ Education, Occupation & Special Status
+        </h3>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="student_status" class="form-label">8. Student / Employment Status</label>
+                <select id="student_status" name="student_status" class="form-select" required>
+                    <option value="Student" selected>🎓 Active Student</option>
+                    <option value="Working">💼 Employed / Working</option>
+                    <option value="Unemployed">🔍 Job Seeker / Unemployed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="education" class="form-label">9. Education Level Attained</label>
+                <select id="education" name="education" class="form-select" required>
+                    <option value="Below 10th">Below 10th</option>
+                    <option value="10th Pass">10th Pass</option>
+                    <option value="12th Pass" selected>12th Pass</option>
+                    <option value="Diploma">Diploma</option>
+                    <option value="Degree">Undergraduate Degree (B.Tech, B.Sc, B.Com, BA)</option>
+                    <option value="Post-Grad">Postgraduate / Doctorate</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="occupation" class="form-label">10. Primary Occupation</label>
+                <select id="occupation" name="occupation" class="form-select" required>
+                    <option value="Student" selected>Student</option>
+                    <option value="Farmer">Farmer / Agriculture</option>
+                    <option value="Worker">Worker / Skilled Technician</option>
+                    <option value="Entrepreneur">Self-Employed / Entrepreneur</option>
+                    <option value="Unemployed">Unemployed / Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">11. Disability Status (PwD)</label>
+                <div class="toggle-group">
+                    <div class="toggle-option">
+                        <input type="radio" id="disability_no" name="is_disabled" value="no" checked onclick="toggleDisabilityPct(false)">
+                        <label for="disability_no" class="toggle-label">No Disability</label>
+                    </div>
+                    <div class="toggle-option">
+                        <input type="radio" id="disability_yes" name="is_disabled" value="yes" onclick="toggleDisabilityPct(true)">
+                        <label for="disability_yes" class="toggle-label">♿ PwD (>= 40%)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="disability_pct_box" class="form-group" style="display: none; background: #fef3c7; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
+            <label for="disability_pct" class="form-label" style="color: #92400e;">Disability Percentage (%)</label>
+            <input type="number" id="disability_pct" name="disability_pct" class="form-control" min="40" max="100" value="40" placeholder="e.g. 40, 50, 75">
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.1rem; padding: 0.9rem;">
+                🔍 Analyze All 12 Factors & Generate Action Plan ➔
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleDisabilityPct(show) {
+    document.getElementById('disability_pct_box').style.display = show ? 'block' : 'none';
+}
+</script>
+{% endblock %}

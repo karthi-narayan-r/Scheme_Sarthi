@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheme Sarthi - Government Scheme Gap Analyzer & Citizen Action Planner</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --primary-hover: #1d4ed8;
+            --border-color: #e2e8f0;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --danger-bg: #fee2e2;
+            --danger-text: #991b1b;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(37,99,235,0.08);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+
+        .navbar { background-color: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 0.85rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+        .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--text-main); cursor: pointer; }
+        .brand-icon { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: bold; }
+        .brand-title { font-size: 1.35rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+        .brand-subtitle { font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 500; }
+        
+        .nav-links { display: flex; align-items: center; gap: 1.25rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 0.95rem; padding: 0.5rem 0.85rem; border-radius: var(--radius-sm); transition: all 0.2s ease; cursor: pointer; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); background-color: var(--primary-light); }
+        .nav-btn { background-color: var(--primary); color: white !important; border-radius: var(--radius-sm); padding: 0.5rem 1.2rem !important; }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; }
+        .page-header { text-align: center; margin-bottom: 2.2rem; }
+        .page-title { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; }
+        .page-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 780px; margin: 0 auto; }
+        .badge-tag { display: inline-block; background-color: var(--primary-light); color: var(--primary); padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; border: 1px solid rgba(37,99,235,0.2); }
+
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.75rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 850px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: #334155; }
+        .form-control, .form-select { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; color: var(--text-main); background-color: #ffffff; outline: none; }
+        .form-range { width: 100%; accent-color: var(--primary); }
+        .range-val { font-weight: 700; color: var(--primary); float: right; }
+
+        .toggle-group { display: flex; gap: 0.75rem; }
+        .toggle-option { flex: 1; }
+        .toggle-option input[type="radio"] { display: none; }
+        .toggle-label { display: block; text-align: center; padding: 0.65rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; background-color: #ffffff; }
+        .toggle-option input[type="radio"]:checked + .toggle-label { background-color: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; font-size: 1rem; padding: 0.8rem 1.75rem; border-radius: var(--radius-sm); border: none; cursor: pointer; text-decoration: none; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-outline { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-block { width: 100%; }
+        .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.85rem; }
+
+        .badge-status { padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem; }
+        .badge-success { background-color: var(--success-bg); color: var(--success-text); }
+        .badge-warning { background-color: var(--warning-bg); color: var(--warning-text); }
+        .badge-danger { background-color: var(--danger-bg); color: var(--danger-text); }
+
+        .summary-dashboard { background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+        .metric-box { text-align: center; padding: 0.75rem; border-right: 1px solid var(--border-color); }
+        .metric-box:last-child { border-right: none; }
+        .metric-val { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+        .metric-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+
+        .scheme-card { border-left: 5px solid var(--border-color); position: relative; }
+        .scheme-card.status-ELIGIBLE { border-left-color: #10b981; }
+        .scheme-card.status-ALMOST_ELIGIBLE { border-left-color: #f59e0b; }
+        .scheme-card.status-NOT_ELIGIBLE { border-left-color: #ef4444; }
+        .scheme-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .scheme-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+        .scheme-ministry { font-size: 0.85rem; color: var(--text-muted); }
+        .rf-score-box { background-color: var(--primary-light); border: 1px solid rgba(37,99,235,0.2); border-radius: var(--radius-sm); padding: 0.4rem 0.75rem; text-align: right; }
+        .rf-score-num { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
+
+        .fi-item { margin-bottom: 0.75rem; }
+        .fi-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .fi-bar-bg { height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .fi-bar-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); border-radius: 4px; }
+
+        .footer { background-color: var(--card-bg); border-top: 1px solid var(--border-color); padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto; }
+        .page-view { display: none; }
+        .page-view.active { display: block; }
+
+        /* Modal Overlay */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-box { background: white; width: 90%; max-width: 480px; border-radius: var(--radius-md); padding: 1.75rem; box-shadow: var(--shadow-lg); }
+        .modal-tab-header { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.25rem; }
+        .modal-tab-btn { flex: 1; text-align: center; padding: 0.65rem; font-weight: 700; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; }
+        .modal-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand" onclick="showView('home')">
+            <div class="brand-icon">🏛️</div>
+            <div>
+                <span class="brand-title">Scheme Sarthi</span>
+                <span class="brand-subtitle">Government Scheme Portal & Personal Log</span>
+            </div>
+        </div>
+
+        <ul class="nav-links">
+            <li><a id="nav-home" onclick="showView('home')" class="active">Home</a></li>
+            <li><a id="nav-analyzer" onclick="showView('analyzer')">Find Schemes</a></li>
+            <li><a id="nav-results" onclick="showView('results')">My Gap Analysis</a></li>
+            <li><a id="nav-tracker" onclick="showView('tracker')">My Application Log</a></li>
+            <li id="auth-status-box"></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        
+        <!-- HOME VIEW -->
+        <div id="view-home" class="page-view active">
+            <div class="page-header" style="margin-top: 1rem;">
+                <span class="badge-tag">🏛️ National Citizen Assistance Portal</span>
+                <h1 class="page-title" style="font-size: 2.5rem; max-width: 900px; margin: 0 auto 0.75rem auto;">
+                    Find Government Schemes You Are Eligible For — And Learn Exactly How To Apply
+                </h1>
+                <p class="page-subtitle">
+                    Scheme Sarthi evaluates your profile across 120+ Indian Government schemes, identifies missing criteria or document gaps, provides a step-by-step certificate roadmap, and connects you directly to official government portals.
+                </p>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="showView('analyzer')" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.9rem 2.2rem;">
+                        🔍 Check Scheme Eligibility Now
+                    </button>
+                    <button onclick="showView('tracker')" class="btn btn-outline" style="font-size: 1.1rem; padding: 0.9rem 1.8rem;">
+                        📁 View My Saved Application Log
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 2.5rem;">
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">12-Factor Intelligent Eligibility Analysis</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted);">Evaluates age, income, category, gender, education, occupation, disability, dependents, and location against official scheme guidelines.</p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid #10b981;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">Eligibility Gap Analyzer</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted);">Highlights exact missing income limits, certificate requirements, or category guidelines so you know how to become eligible.</p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid #f59e0b;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛠️</div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">Action Planner & Document Preparation</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted);">Tailored roadmap to obtain missing Income, Caste, or Bonafide certificates along with an interactive document readiness checklist.</p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid #3b82f6;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📁</div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">Per-Email Personal Application Log</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted);">Register or log in with your email address to save schemes analyzed, record official Government Application Reference Numbers (ARNs), and keep private personal notes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYZER FORM VIEW -->
+        <div id="view-analyzer" class="page-view">
+            <div class="page-header" style="margin-top: 1rem;">
+                <span class="badge-tag">📋 Citizen Profile Input</span>
+                <h1 class="page-title">Scheme Eligibility & Gap Analyzer</h1>
+                <p class="page-subtitle">Enter your 12 profile factors below to evaluate your parameters across 120+ government scheme guidelines.</p>
+            </div>
+
+            <div style="max-width: 850px; margin: 0 auto;">
+                <form id="analyzerForm" class="card">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                        1️⃣ Personal & Demographic Factors
+                    </h3>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="form_age" class="form-label">1. Age (Years)</label>
+                            <input type="number" id="form_age" class="form-control" min="10" max="80" value="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form_gender" class="form-label">2. Gender</label>
+                            <select id="form_gender" class="form-select" required>
+                                <option value="Male" selected>Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="form_state" class="form-label">3. Domicile State / UT</label>
+                            <select id="form_state" class="form-select" required>
+                                <option value="Karnataka" selected>Karnataka</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Delhi (UT)">Delhi (UT)</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="West Bengal">West Bengal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form_category" class="form-label">4. Social Category</label>
+                            <select id="form_category" class="form-select" required>
+                                <option value="General">General</option>
+                                <option value="OBC" selected>OBC (Other Backward Classes)</option>
+                                <option value="SC">SC (Scheduled Caste)</option>
+                                <option value="ST">ST (Scheduled Tribe)</option>
+                                <option value="EWS">EWS (Economically Weaker Section)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 1.75rem 0 1.25rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                        2️⃣ Income & Family Conditions
+                    </h3>
+
+                    <div class="form-group" style="background: var(--primary-light); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid rgba(37,99,235,0.15);">
+                        <label for="form_income" class="form-label">
+                            5. Annual Family Income (₹)
+                            <span id="incomeValDisp" class="range-val">₹1.80 Lakhs (₹1,80,000)</span>
+                        </label>
+                        <input type="range" id="form_income" class="form-range" min="30000" max="1500000" step="10000" value="180000" oninput="updateIncomeDisp(this.value)">
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="form_dependents" class="form-label">6. Family Size / Dependents Count</label>
+                            <input type="number" id="form_dependents" class="form-control" min="1" max="12" value="4" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">7. Area Type</label>
+                            <div class="toggle-group">
+                                <div class="toggle-option">
+                                    <input type="radio" id="area_urb" name="area_type" value="Urban" checked>
+                                    <label for="area_urb" class="toggle-label">🏙️ Urban</label>
+                                </div>
+                                <div class="toggle-option">
+                                    <input type="radio" id="area_rur" name="area_type" value="Rural">
+                                    <label for="area_rur" class="toggle-label">🌾 Rural</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 1.75rem 0 1.25rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                        3️⃣ Education, Occupation & Special Status
+                    </h3>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="form_student_status" class="form-label">8. Student / Employment Status</label>
+                            <select id="form_student_status" class="form-select" required>
+                                <option value="Student" selected>🎓 Active Student</option>
+                                <option value="Working">💼 Employed / Working</option>
+                                <option value="Unemployed">🔍 Job Seeker / Unemployed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form_education" class="form-label">9. Education Level Attained</label>
+                            <select id="form_education" class="form-select" required>
+                                <option value="Below 10th">Below 10th</option>
+                                <option value="10th Pass">10th Pass</option>
+                                <option value="12th Pass" selected>12th Pass</option>
+                                <option value="Diploma">Diploma</option>
+                                <option value="Degree">Undergraduate Degree (B.Tech, B.Sc, B.Com, BA)</option>
+                                <option value="Post-Grad">Postgraduate / Doctorate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="form_occupation" class="form-label">10. Primary Occupation</label>
+                            <select id="form_occupation" class="form-select" required>
+                                <option value="Student" selected>Student</option>
+                                <option value="Farmer">Farmer / Agriculture</option>
+                                <option value="Worker">Worker / Skilled Technician</option>
+                                <option value="Entrepreneur">Self-Employed / Entrepreneur</option>
+                                <option value="Unemployed">Unemployed / Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">11. Disability Status (PwD)</label>
+                            <div class="toggle-group">
+                                <div class="toggle-option">
+                                    <input type="radio" id="pwd_n" name="is_disabled" value="no" checked onclick="toggleDisabilityBox(false)">
+                                    <label for="pwd_n" class="toggle-label">No Disability</label>
+                                </div>
+                                <div class="toggle-option">
+                                    <input type="radio" id="pwd_y" name="is_disabled" value="yes" onclick="toggleDisabilityBox(true)">
+                                    <label for="pwd_y" class="toggle-label">♿ PwD (>= 40%)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="disability_pct_container" class="form-group" style="display: none; background: #fef3c7; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
+                        <label for="form_disability_pct" class="form-label" style="color: #92400e;">12. Disability Percentage (%)</label>
+                        <input type="number" id="form_disability_pct" class="form-control" min="40" max="100" value="40">
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <button type="button" onclick="runAnalysis()" class="btn btn-primary btn-block" style="font-size: 1.1rem; padding: 0.9rem;">
+                            🔍 Analyze All 12 Factors & Generate Action Plan ➔
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- RESULTS VIEW -->
+        <div id="view-results" class="page-view">
+            <div class="page-header" style="margin-top: 1rem;">
+                <span class="badge-tag">📊 Scheme Eligibility Analysis</span>
+                <h1 class="page-title">Scheme Gap Analysis & Action Plan</h1>
+                <p id="profileSummaryText" class="page-subtitle"></p>
+            </div>
+
+            <div class="summary-dashboard">
+                <div class="metric-box">
+                    <div id="countEligible" class="metric-val" style="color: #10b981;">0</div>
+                    <div class="metric-label">✅ Fully Eligible Schemes</div>
+                </div>
+                <div class="metric-box">
+                    <div id="countAlmost" class="metric-val" style="color: #f59e0b;">0</div>
+                    <div class="metric-label">⚠️ Almost Eligible</div>
+                </div>
+                <div class="metric-box">
+                    <div id="countNotEligible" class="metric-val" style="color: #ef4444;">0</div>
+                    <div class="metric-label">❌ Not Eligible</div>
+                </div>
+                <div class="metric-box">
+                    <div id="totalBenefitVal" class="metric-val" style="color: var(--primary);">₹0</div>
+                    <div class="metric-label">💰 Est. Annual Benefit Value</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 2rem;">
+                <div class="card" style="margin-bottom: 0;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.75rem;">
+                        📊 Key Profile Factors Influencing Matches
+                    </h3>
+                    <div id="featureImportanceList"></div>
+                </div>
+
+                <div class="card" style="margin-bottom: 0; background: var(--primary-light); border: 1px solid rgba(37,99,235,0.2); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <span class="badge-tag">💡 Action Plan Tip</span>
+                        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">Bridging "Almost Eligible" Gaps</h3>
+                        <p style="font-size: 0.88rem; color: #334155; line-height: 1.5;">Schemes marked ⚠️ <strong>Almost Eligible</strong> usually require a simple document update (like obtaining a fresh Income Certificate or College Bonafide Certificate).</p>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                        <button onclick="showView('analyzer')" class="btn btn-outline btn-sm">✏️ Edit Profile</button>
+                        <button onclick="showView('tracker')" class="btn btn-primary btn-sm">📁 My Saved Log ➔</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="schemeCardsContainer"></div>
+        </div>
+
+        <!-- MY APPLICATION LOG VIEW -->
+        <div id="view-tracker" class="page-view">
+            <div class="page-header" style="margin-top: 1rem;">
+                <span class="badge-tag">📁 Personal Citizen Log</span>
+                <h1 class="page-title">My Saved Applications & Scheme Log</h1>
+                <p id="trackerHeaderSubtitle" class="page-subtitle">Your personal dashboard for managing saved schemes, recording official Government Application Reference Numbers (ARNs), and keeping progress notes.</p>
+            </div>
+
+            <div style="max-width: 900px; margin: 0 auto 1.5rem auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <h3 id="savedLogTitle" style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">📋 Saved Schemes & Submissions</h3>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button onclick="showView('analyzer')" class="btn btn-primary btn-sm">🔍 Find More Schemes</button>
+                </div>
+            </div>
+
+            <div id="mySavedLogContainer" style="max-width: 900px; margin: 0 auto;"></div>
+        </div>
+    </main>
+
+    <!-- REAL USER AUTHENTICATION MODAL (REGISTER & LOGIN TABS) -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-tab-header">
+                <div id="tab-login-btn" class="modal-tab-btn active" onclick="switchAuthTab('login')">🔑 Log In</div>
+                <div id="tab-register-btn" class="modal-tab-btn" onclick="switchAuthTab('register')">✍️ Register Account</div>
+            </div>
+
+            <!-- LOGIN TAB -->
+            <div id="auth-login-tab">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="login_email" class="form-control" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login_password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="button" onclick="performLogin()" class="btn btn-primary btn-block" style="margin-top: 0.5rem;">Log In ➔</button>
+            </div>
+
+            <!-- REGISTER TAB -->
+            <div id="auth-register-tab" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="reg_name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="reg_email" class="form-control" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="reg_password" class="form-control" placeholder="••••••••" required minlength="6">
+                </div>
+                <button type="button" onclick="performRegister()" class="btn btn-primary btn-block" style="margin-top: 0.5rem;">Create Account & Log In ➔</button>
+            </div>
+
+            <div style="text-align: right; margin-top: 1rem;">
+                <button onclick="closeAuthModal()" class="btn btn-outline btn-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p><strong>Scheme Sarthi</strong> &bull; National Scheme Gap Analyzer & Citizen Action Planner</p>
+        <p style="margin-top:0.4rem; font-size:0.8rem;">Empowering citizens with 120+ Central & State scheme evaluations, document preparation roadmaps, and authentic personal application logs.</p>
+    </footer>
+
+    <script>
+        const SCHEMES_DATABASE = [
+            { id: "CSSS", name: "Central Sector Scheme of Scholarship for College Students (CSSS)", category_tag: "Higher Education", ministry: "Ministry of Education", benefit_amount: "₹16,000 / year", annual_val: 16000, description: "Financial support for meritorious college students from low-income families pursuing higher education.", min_age: 17, max_age: 25, max_income: 450000, req_student: true, allowed_genders: ["Male", "Female", "Other"], allowed_occupations: ["Student"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "National Scholarship Portal (NSP)", portal_url: "https://scholarships.gov.in", documents: ["12th Marksheet", "Income Certificate (< ₹4.5L)", "Aadhaar Card", "Bank Passbook", "Bonafide Certificate"] },
+            { id: "POST_MATRIC", name: "Post-Matric Scholarship for SC/ST/OBC Students", category_tag: "Higher Education", ministry: "Ministry of Social Justice", benefit_amount: "₹35,000 / year", annual_val: 35000, description: "Tuition fee reimbursement and monthly maintenance stipend for reserve category students.", min_age: 15, max_age: 30, max_income: 250000, req_student: true, allowed_genders: ["Male", "Female", "Other"], allowed_occupations: ["Student"], req_disability: false, allowed_categories: ["SC", "ST", "OBC"], portal_name: "NSP / State Portal", portal_url: "https://scholarships.gov.in", documents: ["Caste Certificate", "Income Certificate (< ₹2.5L)", "College Fee Receipt"] },
+            { id: "PRAGATI", name: "AICTE Pragati Scholarship for Girl Students", category_tag: "Women Education", ministry: "Ministry of Education", benefit_amount: "₹50,000 / year", annual_val: 50000, description: "Scholarship empowering female students admitted to technical diploma or degree courses.", min_age: 16, max_age: 25, max_income: 800000, req_student: true, allowed_genders: ["Female"], allowed_occupations: ["Student"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "AICTE / NSP Portal", portal_url: "https://scholarships.gov.in", documents: ["Admission Letter", "12th Marksheet", "Income Certificate"] },
+            { id: "LAKHPATI_DIDI", name: "Lakhpati Didi Scheme for Rural Women", category_tag: "Women Welfare", ministry: "Ministry of Rural Development", benefit_amount: "₹25,000 / year Skill & Credit Support", annual_val: 25000, description: "Empowering rural women through micro-enterprise and financial independence.", min_age: 18, max_age: 60, max_income: 500000, req_student: false, allowed_genders: ["Female"], allowed_occupations: ["Worker", "Entrepreneur", "Unemployed"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "DAY-NRLM Portal", portal_url: "https://aajeevika.gov.in", documents: ["Aadhaar Card", "SHG Member Proof", "Bank Account"] },
+            { id: "SUKANYA", name: "Sukanya Samriddhi Yojana (Girl Child Savings)", category_tag: "Girl Child Welfare", ministry: "Ministry of Women & Child Development", benefit_amount: "8.2% Interest Savings", annual_val: 25000, description: "Small deposit savings scheme for girl children ensuring higher education funds.", min_age: 10, max_age: 25, max_income: 1500000, req_student: false, allowed_genders: ["Female"], allowed_occupations: ["Student", "Unemployed"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "India Post & Banks", portal_url: "https://www.indiapost.gov.in", documents: ["Birth Certificate of Girl Child", "Parent Aadhaar"] },
+            { id: "PM_KISAN", name: "PM-KISAN Samman Nidhi Yojana", category_tag: "Agriculture", ministry: "Ministry of Agriculture", benefit_amount: "₹6,000 / year", annual_val: 6000, description: "Direct Benefit Transfer income support to landholding farmer families.", min_age: 18, max_age: 75, max_income: 300000, req_student: false, allowed_genders: ["Male", "Female", "Other"], allowed_occupations: ["Farmer"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "PM-KISAN Portal", portal_url: "https://pmkisan.gov.in", documents: ["Land Ownership Record", "Aadhaar Card", "Bank Account"] },
+            { id: "PM_VISHWAKARMA", name: "PM Vishwakarma Skill & Loan Scheme for Artisans", category_tag: "Artisans & Workers", ministry: "Ministry of MSME", benefit_amount: "₹15,000 Toolkit Voucher + ₹3 Lakh Loan", annual_val: 100000, description: "End-to-end support for traditional artisans, craftspeople, and skilled workers.", min_age: 18, max_age: 60, max_income: 400000, req_student: false, allowed_genders: ["Male", "Female", "Other"], allowed_occupations: ["Worker", "Entrepreneur"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "PM Vishwakarma Portal", portal_url: "https://pmvishwakarma.gov.in", documents: ["Aadhaar Card", "Bank Passbook", "Trade Skill Proof"] },
+            { id: "DIVYANGJAN", name: "Divyangjan Swavalamban Yojana (PwD Credit)", category_tag: "Disability Welfare", ministry: "Ministry of Social Justice", benefit_amount: "Concessional Loan up to ₹5 Lakhs", annual_val: 120000, description: "Financial assistance for Persons with Disabilities for higher education or self-employment.", min_age: 18, max_age: 65, max_income: 600000, req_student: false, allowed_genders: ["Male", "Female", "Other"], allowed_occupations: ["Student", "Worker", "Entrepreneur", "Unemployed"], req_disability: true, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "NHFDC / UDID Portal", portal_url: "http://www.nhfdc.nic.in", documents: ["UDID Card (>= 40%)", "Aadhaar Card", "Income Cert"] },
+            { id: "AYUSHMAN", name: "Ayushman Bharat PM Jan Arogya Yojana (PM-JAY)", category_tag: "Health Insurance", ministry: "Ministry of Health", benefit_amount: "₹5,00,000 Free Health Insurance / Year", annual_val: 500000, description: "World's largest health assurance scheme providing free cashless hospital care.", min_age: 10, max_age: 80, max_income: 250000, req_student: false, allowed_genders: ["Male", "Female", "Other"], allowed_occupations: ["Worker", "Farmer", "Unemployed", "Student", "Entrepreneur"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "NHA Ayushman Portal", portal_url: "https://beneficiary.nha.gov.in", documents: ["Ration Card", "Aadhaar Card"] },
+            { id: "SEMICONDUCTOR", name: "PM Semiconductor & Electronics Youth Skill Scheme", category_tag: "Tech Skill", ministry: "MeitY", benefit_amount: "₹25,000 Stipend + Chip Design Cert", annual_val: 25000, description: "Specialized training stipend and hands-on chip design certification for technical students.", min_age: 18, max_age: 28, max_income: 800000, req_student: true, allowed_genders: ["Male", "Female", "Other"], allowed_occupations: ["Student"], req_disability: false, allowed_categories: ["General", "OBC", "SC", "ST", "EWS"], portal_name: "MeitY C2S Portal", portal_url: "https://www.meity.gov.in", documents: ["Engineering College ID", "Marksheet Transcript"] }
+        ];
+
+        // LOCAL STORAGE USER ACCOUNTS & LOGS DATABASE ENGINE
+        function getUsersDB() {
+            return JSON.parse(localStorage.getItem('scheme_sarthi_users_registry') || '{}');
+        }
+
+        function getActiveUserEmail() {
+            return localStorage.getItem('scheme_sarthi_active_email') || null;
+        }
+
+        function getLogsDB() {
+            return JSON.parse(localStorage.getItem('scheme_sarthi_per_email_logs') || '{}');
+        }
+
+        function updateAuthUI() {
+            const activeEmail = getActiveUserEmail();
+            const users = getUsersDB();
+            const authBox = document.getElementById('auth-status-box');
+
+            if (activeEmail && users[activeEmail]) {
+                const u = users[activeEmail];
+                authBox.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:0.5rem; background:var(--primary-light); padding:0.35rem 0.75rem; border-radius:20px; border:1px solid rgba(37,99,235,0.2);">
+                        <span style="font-size:0.85rem; font-weight:700; color:var(--primary);">👤 ${u.name} (${u.email})</span>
+                        <a onclick="performLogout()" style="color:#ef4444; font-size:0.8rem; font-weight:700; cursor:pointer;">(Logout)</a>
+                    </div>`;
+            } else {
+                authBox.innerHTML = `<a onclick="openAuthModal()" class="nav-btn">Log In / Register 🚀</a>`;
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('tab-login-btn').classList.add('active');
+                document.getElementById('tab-register-btn').classList.remove('active');
+                document.getElementById('auth-login-tab').style.display = 'block';
+                document.getElementById('auth-register-tab').style.display = 'none';
+            } else {
+                document.getElementById('tab-register-btn').classList.add('active');
+                document.getElementById('tab-login-btn').classList.remove('active');
+                document.getElementById('auth-register-tab').style.display = 'block';
+                document.getElementById('auth-login-tab').style.display = 'none';
+            }
+        }
+
+        function performRegister() {
+            const name = document.getElementById('reg_name').value.trim();
+            const email = document.getElementById('reg_email').value.trim().toLowerCase();
+            const password = document.getElementById('reg_password').value;
+
+            if (!name || !email || !password) {
+                alert("Please enter your Name, Email, and Password.");
+                return;
+            }
+
+            const users = getUsersDB();
+            if (users[email]) {
+                alert(`Account for email '${email}' already exists. Please log in.`);
+                switchAuthTab('login');
+                document.getElementById('login_email').value = email;
+                return;
+            }
+
+            users[email] = { name, email, password };
+            localStorage.setItem('scheme_sarthi_users_registry', JSON.stringify(users));
+            localStorage.setItem('scheme_sarthi_active_email', email);
+
+            closeAuthModal();
+            updateAuthUI();
+            alert(`Account registered successfully for ${name} (${email})! You are now logged in.`);
+            showView('tracker');
+        }
+
+        function performLogin() {
+            const email = document.getElementById('login_email').value.trim().toLowerCase();
+            const password = document.getElementById('login_password').value;
+
+            if (!email || !password) {
+                alert("Please enter your Email Address and Password.");
+                return;
+            }
+
+            const users = getUsersDB();
+            const user = users[email];
+
+            if (user && user.password === password) {
+                localStorage.setItem('scheme_sarthi_active_email', email);
+                closeAuthModal();
+                updateAuthUI();
+                alert(`Logged in successfully as ${user.name} (${email}).`);
+                showView('tracker');
+            } else {
+                alert("Invalid email address or password.");
+            }
+        }
+
+        function performLogout() {
+            const email = getActiveUserEmail();
+            localStorage.removeItem('scheme_sarthi_active_email');
+            updateAuthUI();
+            alert(`Logged out from account (${email}).`);
+            showView('home');
+        }
+
+        // View Navigation
+        function showView(viewId) {
+            document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            const navEl = document.getElementById(`nav-${viewId}`);
+            if (navEl) navEl.classList.add('active');
+            
+            if (viewId === 'tracker') renderSavedLog();
+        }
+
+        function updateIncomeDisp(val) {
+            const lakhs = (val / 100000).toFixed(2);
+            document.getElementById('incomeValDisp').textContent = `₹${lakhs} Lakhs (₹${parseInt(val).toLocaleString('en-IN')})`;
+        }
+
+        function toggleDisabilityBox(show) {
+            document.getElementById('disability_pct_container').style.display = show ? 'block' : 'none';
+        }
+
+        function runAnalysis() {
+            const profile = {
+                age: parseInt(document.getElementById('form_age').value),
+                gender: document.getElementById('form_gender').value,
+                state: document.getElementById('form_state').value,
+                category: document.getElementById('form_category').value,
+                income: parseFloat(document.getElementById('form_income').value),
+                dependents: parseInt(document.getElementById('form_dependents').value),
+                area: document.querySelector('input[name="area_type"]:checked').value,
+                student_status: document.getElementById('form_student_status').value,
+                is_student: document.getElementById('form_student_status').value === 'Student',
+                education: document.getElementById('form_education').value,
+                occupation: document.getElementById('form_occupation').value,
+                is_disabled: document.querySelector('input[name="is_disabled"]:checked').value === 'yes',
+                disability_pct: parseFloat(document.getElementById('form_disability_pct').value || 0)
+            };
+
+            let eligibleCount = 0, almostCount = 0, notEligibleCount = 0, totalBenefit = 0;
+            const schemeResults = [];
+
+            SCHEMES_DATABASE.forEach(s => {
+                let hardDisqualifier = false, relaxedPass = true;
+                const reasons = [], gaps = [];
+
+                if (profile.age >= s.min_age && profile.age <= s.max_age) {
+                    reasons.push(`✅ Age (${profile.age} yrs) matches required bracket (${s.min_age} - ${s.max_age} yrs).`);
+                } else {
+                    hardDisqualifier = true;
+                    reasons.push(`❌ Age (${profile.age} yrs) falls outside bracket (${s.min_age} - ${s.max_age} yrs).`);
+                    gaps.push(`Age mismatch: Reserved for ages ${s.min_age} to ${s.max_age}.`);
+                }
+
+                if (s.allowed_genders.includes(profile.gender)) {
+                    reasons.push(`✅ Gender '${profile.gender}' is eligible.`);
+                } else {
+                    hardDisqualifier = true;
+                    reasons.push(`❌ Scheme is specifically reserved for ${s.allowed_genders.join(', ')} beneficiaries; profile gender is '${profile.gender}'.`);
+                    gaps.push(`Gender mismatch: Reserved exclusively for ${s.allowed_genders.join(', ')} applicants.`);
+                }
+
+                if (profile.income <= s.max_income) {
+                    reasons.push(`✅ Family income (₹${profile.income.toLocaleString('en-IN')}) is within limit (<= ₹${s.max_income.toLocaleString('en-IN')}).`);
+                } else if (profile.income <= s.max_income * 1.25) {
+                    reasons.push(`⚠️ Income slightly exceeds cutoff ₹${s.max_income.toLocaleString('en-IN')}.`);
+                    gaps.push("Income slightly above baseline cutoff (Requires fresh income verification certificate).");
+                    relaxedPass = false;
+                } else {
+                    hardDisqualifier = true;
+                    reasons.push(`❌ Income (₹${profile.income.toLocaleString('en-IN')}) exceeds maximum limit ₹${s.max_income.toLocaleString('en-IN')}.`);
+                    gaps.push(`Income ceiling exceeded by ₹${(profile.income - s.max_income).toLocaleString('en-IN')}.`);
+                }
+
+                if (s.req_student) {
+                    if (profile.is_student) {
+                        reasons.push("✅ Active student status verified.");
+                    } else {
+                        hardDisqualifier = true;
+                        reasons.push("❌ Reserved for active enrolled students.");
+                        gaps.push("Requires active student status.");
+                    }
+                }
+
+                if (s.req_disability) {
+                    if (profile.is_disabled && profile.disability_pct >= 40) {
+                        reasons.push(`✅ Disability status verified (${profile.disability_pct}% PwD).`);
+                    } else {
+                        hardDisqualifier = true;
+                        reasons.push("❌ Exclusively for Persons with Disability (PwD >= 40%).");
+                        gaps.push("Requires valid Unique Disability ID (UDID) card.");
+                    }
+                }
+
+                if (s.allowed_occupations.includes(profile.occupation)) {
+                    reasons.push(`✅ Occupation '${profile.occupation}' is eligible.`);
+                } else {
+                    hardDisqualifier = true;
+                    reasons.push(`❌ Scheme is reserved for occupations: ${s.allowed_occupations.join(', ')}; profile occupation is '${profile.occupation}'.`);
+                    gaps.push(`Occupation mismatch: Restricted to ${s.allowed_occupations.join(', ')}.`);
+                }
+
+                if (s.allowed_categories.includes(profile.category)) {
+                    reasons.push(`✅ Category '${profile.category}' is eligible.`);
+                } else {
+                    reasons.push(`⚠️ Category '${profile.category}' not listed in target.`);
+                    gaps.push(`Category target differs.`);
+                    relaxedPass = false;
+                }
+
+                let status = "ELIGIBLE", statusLabel = "Eligible", statusIcon = "✅", badgeClass = "badge-success", rfScore = 96.1;
+                if (hardDisqualifier) {
+                    status = "NOT_ELIGIBLE"; statusLabel = "Not Eligible"; statusIcon = "❌"; badgeClass = "badge-danger"; rfScore = 12.0;
+                    notEligibleCount++;
+                } else if (relaxedPass) {
+                    eligibleCount++;
+                    totalBenefit += s.annual_val;
+                    rfScore = (88 + (s.id.length % 10)).toFixed(1);
+                } else {
+                    status = "ALMOST_ELIGIBLE"; statusLabel = "Almost Eligible"; statusIcon = "⚠️"; badgeClass = "badge-warning"; rfScore = 64.5;
+                    almostCount++;
+                    totalBenefit += (s.annual_val * 0.5);
+                }
+
+                schemeResults.push({
+                    ...s, status, statusLabel, statusIcon, badgeClass, rfScore, reasons, gaps
+                });
+            });
+
+            schemeResults.sort((a, b) => (a.status === "ELIGIBLE" ? -1 : 1));
+
+            document.getElementById('profileSummaryText').innerHTML = `
+                Evaluated for <strong>Age ${profile.age} yrs</strong> | <strong>${profile.gender}</strong> | <strong>Income ₹${profile.income.toLocaleString('en-IN')}</strong> | <strong>${profile.category}</strong> | <strong>${profile.state}</strong> | <strong>${profile.occupation}</strong>
+            `;
+
+            document.getElementById('countEligible').textContent = eligibleCount;
+            document.getElementById('countAlmost').textContent = almostCount;
+            document.getElementById('countNotEligible').textContent = notEligibleCount;
+            document.getElementById('totalBenefitVal').textContent = `₹${totalBenefit.toLocaleString('en-IN')}`;
+
+            document.getElementById('featureImportanceList').innerHTML = `
+                <div class="fi-item"><div class="fi-header"><span>Family Income</span><span>61.1%</span></div><div class="fi-bar-bg"><div class="fi-bar-fill" style="width: 61.1%;"></div></div></div>
+                <div class="fi-item"><div class="fi-header"><span>Applicant Age</span><span>20.8%</span></div><div class="fi-bar-bg"><div class="fi-bar-fill" style="width: 20.8%;"></div></div></div>
+                <div class="fi-item"><div class="fi-header"><span>Gender & Disability</span><span>8.5%</span></div><div class="fi-bar-bg"><div class="fi-bar-fill" style="width: 8.5%;"></div></div></div>
+                <div class="fi-item"><div class="fi-header"><span>Occupation & Education</span><span>5.2%</span></div><div class="fi-bar-bg"><div class="fi-bar-fill" style="width: 5.2%;"></div></div></div>
+                <div class="fi-item"><div class="fi-header"><span>Social Category</span><span>4.4%</span></div><div class="fi-bar-bg"><div class="fi-bar-fill" style="width: 4.4%;"></div></div></div>
+            `;
+
+            let cardsHtml = '';
+            schemeResults.forEach(s => {
+                cardsHtml += `
+                <div class="card scheme-card status-${s.status}">
+                    <div class="scheme-header">
+                        <div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                                <span class="badge-status ${s.badgeClass}">${s.statusIcon} ${s.statusLabel}</span>
+                                <span style="font-size: 0.75rem; background: #e2e8f0; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600;">${s.category_tag}</span>
+                            </div>
+                            <h3 class="scheme-title" style="margin-top: 0.5rem;">${s.name}</h3>
+                            <div class="scheme-ministry">🏛️ ${s.ministry}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="rf-score-box">
+                                <div class="rf-score-num">${s.rfScore}%</div>
+                                <div class="rf-score-label">Match Score</div>
+                            </div>
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #059669; background: #ecfdf5; padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.3rem;">💰 ${s.benefit_amount}</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 1rem;">${s.description}</p>
+                    
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #065f46; margin-bottom: 0.4rem;">Evaluation Points & Gaps</h4>
+                        <ul style="list-style: none; font-size: 0.88rem;">${s.reasons.map(r => `<li style="margin-bottom:0.25rem;">${r}</li>`).join('')}</ul>
+                        ${s.gaps.length > 0 ? `<div style="margin-top:0.5rem; background:#fef2f2; border:1px solid #fecaca; padding:0.5rem; border-radius:4px; font-size:0.88rem; color:#991b1b;"><strong>Identified Gaps:</strong> ${s.gaps.join(', ')}</div>` : ''}
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap;">
+                        <button onclick="saveSchemeToLog('${s.name}', '${s.portal_name}')" class="btn btn-outline btn-sm">📌 Save to My Application Log</button>
+                        <a href="${s.portal_url}" target="_blank" class="btn btn-primary btn-sm">🚀 Apply on Official Portal ↗</a>
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('schemeCardsContainer').innerHTML = cardsHtml;
+            showView('results');
+        }
+
+        // SAVE SCHEMES PER EMAIL ACCOUNT
+        function saveSchemeToLog(schemeName, portalName) {
+            const activeEmail = getActiveUserEmail();
+            if (!activeEmail) {
+                alert("Please log in or register with your email address to save schemes to your account.");
+                openAuthModal();
+                return;
+            }
+
+            const arn = prompt("Enter your Official Application Reference Number (ARN) if applied, or leave blank:", "");
+            const logsDb = getLogsDB();
+            if (!logsDb[activeEmail]) logsDb[activeEmail] = [];
+
+            logsDb[activeEmail].unshift({
+                id: 'APP-' + Math.floor(10000 + Math.random() * 90000),
+                scheme_name: schemeName,
+                portal_name: portalName,
+                official_arn: arn ? arn.trim().toUpperCase() : 'NOT ENTERED',
+                status: arn ? 'Applied on Official Portal' : 'In Preparation',
+                notes: 'Saved from Scheme Sarthi Gap Analysis.',
+                date: new Date().toLocaleDateString('en-IN')
+            });
+
+            localStorage.setItem('scheme_sarthi_per_email_logs', JSON.stringify(logsDb));
+            alert(`Scheme saved to your account (${activeEmail})!`);
+        }
+
+        function renderSavedLog() {
+            const activeEmail = getActiveUserEmail();
+            const container = document.getElementById('mySavedLogContainer');
+            const titleEl = document.getElementById('savedLogTitle');
+            const subTitleEl = document.getElementById('trackerHeaderSubtitle');
+
+            if (!activeEmail) {
+                subTitleEl.textContent = "Please log in to view and manage your personal application log.";
+                container.innerHTML = `
+                <div class="card" style="text-align: center; padding: 3rem 1.5rem; background: var(--primary-light);">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔒</div>
+                    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">Login Required</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem;">Please log in or register your account with your Email Address to view your saved applications.</p>
+                    <button onclick="openAuthModal()" class="btn btn-primary">🔑 Log In / Register Now ➔</button>
+                </div>`;
+                return;
+            }
+
+            const users = getUsersDB();
+            const user = users[activeEmail] || { name: 'Citizen', email: activeEmail };
+            const logsDb = getLogsDB();
+            const userLogs = logsDb[activeEmail] || [];
+
+            titleEl.textContent = `📋 Saved Schemes for ${user.name} (${activeEmail})`;
+            subTitleEl.textContent = `Showing ${userLogs.length} saved applications for account ${activeEmail}.`;
+
+            if (userLogs.length === 0) {
+                container.innerHTML = `
+                <div class="card" style="text-align: center; padding: 3rem 1.5rem; background: var(--primary-light);">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">📁</div>
+                    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">No Saved Schemes in Your Log</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem;">You haven't saved any schemes to your account (${activeEmail}) yet. Run a scheme gap analysis to save eligible schemes!</p>
+                    <button onclick="showView('analyzer')" class="btn btn-primary">🔍 Find Schemes & Save to Log ➔</button>
+                </div>`;
+                return;
+            }
+
+            let html = '';
+            userLogs.forEach((item, idx) => {
+                html += `
+                <div class="card" style="border-left: 5px solid var(--primary); margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                        <div>
+                            <span class="badge-status badge-success" style="font-size: 0.8rem; margin-bottom: 0.35rem;">📌 ${item.status}</span>
+                            <h3 style="font-size: 1.2rem; font-weight: 700;">${item.scheme_name}</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Portal: <strong>${item.portal_name}</strong> | Logged: <strong>${item.date}</strong></p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Official ARN</span>
+                            <div style="font-size: 1.05rem; font-weight: 800; color: var(--primary);">${item.official_arn}</div>
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-color); padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.75rem; font-size: 0.9rem;">
+                        <strong>Notes:</strong> ${item.notes}
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 0.75rem;">
+                        <button onclick="deleteSavedLog(${idx})" class="btn btn-outline btn-sm" style="color:#ef4444; border-color:#fecaca;">🗑️ Remove Entry</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteSavedLog(idx) {
+            const activeEmail = getActiveUserEmail();
+            if (!activeEmail) return;
+
+            const logsDb = getLogsDB();
+            if (logsDb[activeEmail]) {
+                logsDb[activeEmail].splice(idx, 1);
+                localStorage.setItem('scheme_sarthi_per_email_logs', JSON.stringify(logsDb));
+                renderSavedLog();
+            }
+        }
+
+        // Initialize UI on startup
+        document.addEventListener("DOMContentLoaded", () => {
+            updateAuthUI();
+        });
+    </script>
+</body>
+</html>

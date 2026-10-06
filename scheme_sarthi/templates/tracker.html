@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}My Saved Applications & Scheme Log - Scheme Sarthi{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-top: 1rem;">
+    <span class="badge-tag">📁 Personal Citizen Log</span>
+    <h1 class="page-title">My Saved Applications & Scheme Log</h1>
+    <p class="page-subtitle">
+        Your personal dashboard for managing saved schemes, recording official Government Application Reference Numbers (ARNs), and keeping progress notes.
+    </p>
+</div>
+
+<!-- Log Header Action Bar -->
+<div style="max-width: 900px; margin: 0 auto 1.5rem auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">
+            📋 Saved Schemes & Submissions ({{ my_apps|length }})
+        </h3>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{{ url_for('analyzer') }}" class="btn btn-primary btn-sm">
+            🔍 Find More Schemes
+        </a>
+        <button onclick="openAddLogModal()" class="btn btn-outline btn-sm">
+            ➕ Log New Application
+        </button>
+    </div>
+</div>
+
+{% if my_apps %}
+<!-- List of Saved Applications -->
+<div style="max-width: 900px; margin: 0 auto;">
+    {% for item in my_apps %}
+    <div class="card" id="app-card-{{ item.app_id }}" style="margin-bottom: 1.25rem; border-left: 5px solid var(--primary); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span class="badge-status badge-success" style="font-size: 0.8rem; margin-bottom: 0.35rem;">
+                    📌 {{ item.status }}
+                </span>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-top: 0.2rem;">
+                    {{ item.scheme_name }}
+                </h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.15rem;">
+                    Portal: <strong>{{ item.portal_name }}</strong> | Logged Date: <strong>{{ item.created_at }}</strong>
+                </p>
+            </div>
+
+            <div style="text-align: right;">
+                <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Official ARN / Ref No.</span>
+                <div style="font-size: 1.05rem; font-weight: 800; color: var(--primary);">
+                    {% if item.official_arn != 'Not Entered' %}{{ item.official_arn }}{% else %}<span style="color: #94a3b8; font-weight: 500;">No ARN Recorded</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Notes Box -->
+        <div style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-top: 1rem; font-size: 0.9rem;">
+            <strong style="color: #334155; display: block; margin-bottom: 0.2rem;">💬 Personal Notes & Document Status:</strong>
+            <p style="color: #475569; margin: 0; line-height: 1.5;">{{ item.notes }}</p>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 0.85rem;">
+            <button onclick="deleteLogEntry('{{ item.app_id }}')" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: #fecaca; font-size: 0.8rem;">
+                🗑️ Remove Entry
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="card" style="max-width: 700px; margin: 0 auto; text-align: center; padding: 3rem 1.5rem; background: var(--primary-light); border: 1px solid rgba(37,99,235,0.2);">
+    <div style="font-size: 3rem; margin-bottom: 0.5rem;">📁</div>
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+        Your Personal Application Log is Empty
+    </h3>
+    <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 1.5rem auto;">
+        You haven't saved any government schemes yet. Run a scheme gap analysis to save eligible schemes, or log a scheme you applied for directly on an official portal!
+    </p>
+    <a href="{{ url_for('analyzer') }}" class="btn btn-primary">
+        🔍 Analyze Schemes & Save to Log ➔
+    </a>
+</div>
+{% endif %}
+
+<!-- Manual Add Log Modal / Form Script -->
+<div id="addLogModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="width: 90%; max-width: 500px; background: white; box-shadow: var(--shadow-lg);">
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem;">
+            ➕ Log New Government Scheme Application
+        </h3>
+
+        <div class="form-group">
+            <label class="form-label">Scheme Name</label>
+            <input type="text" id="log_scheme_name" class="form-control" placeholder="e.g. Post-Matric Scholarship for SC/ST/OBC" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Official Application Reference No. (ARN / Acknowledgement)</label>
+            <input type="text" id="log_official_arn" class="form-control" placeholder="e.g. NSP2026889412 (Optional)">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Application Status</label>
+            <select id="log_status" class="form-select">
+                <option value="Applied on Official Portal">Applied on Official Portal</option>
+                <option value="In Preparation (Documents Pending)">In Preparation (Documents Pending)</option>
+                <option value="Submitted Hard Copy to Office">Submitted Hard Copy to Office</option>
+                <option value="Sanctioned & Benefit Disbursed">Sanctioned & Benefit Disbursed</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Personal Notes & Checklist</label>
+            <textarea id="log_notes" class="form-control" rows="3" placeholder="e.g. Income certificate submitted at Tehsildar office. Bonafide signed by Principal."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+            <button onclick="closeAddLogModal()" class="btn btn-outline btn-sm">Cancel</button>
+            <button onclick="submitManualLog()" class="btn btn-primary btn-sm">Save to My Log ➔</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openAddLogModal() {
+    document.getElementById('addLogModal').style.display = 'flex';
+}
+
+function closeAddLogModal() {
+    document.getElementById('addLogModal').style.display = 'none';
+}
+
+function submitManualLog() {
+    const schemeName = document.getElementById('log_scheme_name').value.trim();
+    if (!schemeName) {
+        alert("Please enter the scheme name.");
+        return;
+    }
+
+    const payload = {
+        scheme_name: schemeName,
+        portal_name: "Official Portal",
+        official_arn: document.getElementById('log_official_arn').value.trim(),
+        status: document.getElementById('log_status').value,
+        notes: document.getElementById('log_notes').value.trim()
+    };
+
+    fetch('/api/save_application', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            closeAddLogModal();
+            window.location.reload();
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+function deleteLogEntry(appId) {
+    if (!confirm("Are you sure you want to remove this item from your personal log?")) return;
+
+    fetch(`/api/delete_application/${appId}`, { method: 'DELETE' })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const card = document.getElementById(`app-card-${appId}`);
+            if (card) card.remove();
+            window.location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}
